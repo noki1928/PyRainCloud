@@ -10,7 +10,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
-      - uses: astral-sh/setup-uv@v10
+      - uses: astral-sh/setup-uv@v10.3.3
       - run: uv run --only-group dev ruff check src tests
       - run: uv run --only-group dev ruff format --check src tests
 
@@ -28,7 +28,7 @@ jobs:
             python-version: "3.12"
     steps:
       - uses: actions/checkout@v7
-      - uses: astral-sh/setup-uv@v10
+      - uses: astral-sh/setup-uv@v10.3.3
         with:
           python-version: ${{ matrix.python-version }}
       - run: uv sync --no-default-groups --group dev
@@ -39,7 +39,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
-      - uses: astral-sh/setup-uv@v10
+      - uses: astral-sh/setup-uv@v10.3.3
       - run: uv build --wheel
       - run: >
           uv run --isolated --no-project --python 3.9
@@ -53,7 +53,7 @@ jobs:
     needs: [lint, test, minimum-versions]
     steps:
       - uses: actions/checkout@v7
-      - uses: astral-sh/setup-uv@v10
+      - uses: astral-sh/setup-uv@v10.3.3
       - run: uv build
       - run: uvx twine check dist/*
       - uses: actions/upload-artifact@v7
