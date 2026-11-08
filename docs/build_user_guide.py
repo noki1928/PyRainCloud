@@ -2,7 +2,7 @@
 
 The Markdown file is the source of truth (it also renders on GitHub). The Word
 look comes from a reference document generated here: pandoc's default
-reference.docx with Calibri text, Consolas code blocks on a light background
+reference.docx with Calibri text, Courier New code blocks on a light background
 with a border, syntax highlighting, bordered tables, centred figures and the
 template's A4 page margins.
 
@@ -28,7 +28,7 @@ SOURCE = DOCS / "USER_GUIDE.md"
 OUTPUT = DOCS / "Инструкция_пользователя_PyRainCloud.docx"
 
 BODY_FONT = "Calibri"
-CODE_FONT = "Consolas"
+CODE_FONT = "Courier New"  # in Office on Windows/macOS; Liberation Mono substitutes on Linux
 ACCENT = RGBColor(0x1F, 0x3A, 0x5F)
 CODE_FILL = "F4F6F8"
 BORDER = "D0D7DE"
