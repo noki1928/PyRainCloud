@@ -59,8 +59,10 @@ def test_cloud_does_not_overlap_box(df, orient):
     axis = 0 if orient == "v" else 1
     for pos, (cloud, box) in enumerate(zip(clouds(ax), boxes(ax))):
         cloud_c = np.concatenate([p.vertices[:, axis] for p in cloud.get_paths()])
-        box_c = box.get_path().vertices[:, axis]
-        assert box_c.min() == pytest.approx(pos - box_width / 2)
+        # extents in data coordinates: patch paths are stored differently across matplotlib versions
+        ext = box.get_extents().transformed(ax.transData.inverted())
+        box_c = np.array([ext.x0, ext.x1] if orient == "v" else [ext.y0, ext.y1])
+        assert box_c.min() == pytest.approx(pos - box_width / 2, abs=0.01)
         if orient == "v":
             assert cloud_c.max() < box_c.min()
         else:
