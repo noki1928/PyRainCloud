@@ -2,15 +2,17 @@
 
 The Markdown file is the source of truth (it also renders on GitHub). The Word
 look comes from a reference document generated here: pandoc's default
-reference.docx with Calibri text, Courier New code blocks on a light background
+reference.docx with Calibri text, Roboto Mono code blocks on a light background
 with a border, syntax highlighting, bordered tables, centred figures and the
-template's A4 page margins.
+template's A4 page margins. Styles are then flattened into direct formatting,
+because the document is meant to be imported into Google Docs.
 
 Run:  uv run python docs/build_user_guide.py
 """
 
 from __future__ import annotations
 
+import copy
 import subprocess
 import tempfile
 from pathlib import Path
@@ -28,7 +30,7 @@ SOURCE = DOCS / "USER_GUIDE.md"
 OUTPUT = DOCS / "Инструкция_пользователя_PyRainCloud.docx"
 
 BODY_FONT = "Calibri"
-CODE_FONT = "Courier New"  # in Office on Windows/macOS; Liberation Mono substitutes on Linux
+CODE_FONT = "Roboto Mono"  # a Google Font: available in Google Docs
 ACCENT = RGBColor(0x1F, 0x3A, 0x5F)
 CODE_FILL = "F4F6F8"
 BORDER = "D0D7DE"
@@ -152,9 +154,90 @@ def make_reference(path: Path) -> None:
     doc.save(str(path))
 
 
+P_ORDER = (
+    "pStyle", "keepNext", "keepLines", "pageBreakBefore", "framePr", "widowControl", "numPr",
+    "suppressLineNumbers", "pBdr", "shd", "tabs", "suppressAutoHyphens", "kinsoku", "wordWrap",
+    "overflowPunct", "topLinePunct", "autoSpaceDE", "autoSpaceDN", "bidi", "adjustRightInd",
+    "snapToGrid", "spacing", "ind", "contextualSpacing", "mirrorIndents", "suppressOverlap", "jc",
+    "textDirection", "textAlignment", "textboxTightWrap", "outlineLvl", "divId", "cnfStyle",
+    "rPr", "sectPr", "pPrChange",
+)  # fmt: skip
+R_ORDER = (
+    "rStyle", "rFonts", "b", "bCs", "i", "iCs", "caps", "smallCaps", "strike", "dstrike",
+    "outline", "shadow", "emboss", "imprint", "noProof", "snapToGrid", "vanish", "webHidden",
+    "color", "spacing", "w", "kern", "position", "sz", "szCs", "highlight", "u", "effect", "bdr",
+    "shd", "fitText", "vertAlign", "rtl", "cs", "em", "lang", "eastAsianLayout", "specVanish",
+)  # fmt: skip
+# Styles Google Docs maps to its own; everything else is flattened into direct formatting.
+NATIVE_STYLES = {"Normal", "Title", "Heading1", "Heading2", "Heading3", "Hyperlink"}
+
+
+def _merge(target, source, order: tuple[str, ...]) -> None:
+    """Copy children of ``source`` missing in ``target``, keeping the schema order."""
+    rank = {qn(f"w:{t}"): i for i, t in enumerate(order)}
+    present = {child.tag for child in target}
+    for child in source:
+        if child.tag in present or child.tag not in rank:
+            continue
+        el = copy.deepcopy(child)
+        later = [c for c in target if rank.get(c.tag, len(order)) > rank[child.tag]]
+        if later:
+            later[0].addprevious(el)
+        else:
+            target.append(el)
+
+
+def _style_chain(styles_el, style_id: str) -> list:
+    """The style and its ``basedOn`` ancestors, most specific first."""
+    chain = []
+    while style_id:
+        st = styles_el.find(f"w:style[@w:styleId='{style_id}']", styles_el.nsmap)
+        if st is None or st in chain:
+            break
+        chain.append(st)
+        based = st.find(qn("w:basedOn"))
+        style_id = based.get(qn("w:val")) if based is not None else None
+        if style_id in NATIVE_STYLES:
+            break
+    return chain
+
+
+def flatten_styles(doc) -> None:
+    """Google Docs drops character and custom paragraph styles on import.
+
+    Write their formatting (code font, shading, borders, token colours, captions)
+    directly onto every paragraph and run so the document looks the same there.
+    """
+    styles_el = doc.styles.element
+    body = doc.element.body
+    for p in body.iter(qn("w:p")):
+        ppr = p.find(qn("w:pPr"))
+        pstyle = ppr.find(qn("w:pStyle")) if ppr is not None else None
+        pid = pstyle.get(qn("w:val")) if pstyle is not None else None
+        chain = _style_chain(styles_el, pid) if pid and pid not in NATIVE_STYLES else []
+        for st in chain:
+            if st.find(qn("w:pPr")) is not None:
+                _merge(p.get_or_add_pPr(), st.find(qn("w:pPr")), P_ORDER)
+        para_rpr = [st.find(qn("w:rPr")) for st in chain if st.find(qn("w:rPr")) is not None]
+        for r in p.iter(qn("w:r")):
+            rpr = r.find(qn("w:rPr"))
+            if rpr is None:
+                rpr = OxmlElement("w:rPr")
+                r.insert(0, rpr)
+            rstyle = rpr.find(qn("w:rStyle"))
+            rid = rstyle.get(qn("w:val")) if rstyle is not None else None
+            if rid and rid not in NATIVE_STYLES:
+                for st in _style_chain(styles_el, rid):
+                    if st.find(qn("w:rPr")) is not None:
+                        _merge(rpr, st.find(qn("w:rPr")), R_ORDER)
+            for src in para_rpr:
+                _merge(rpr, src, R_ORDER)
+
+
 def finish(path: Path) -> None:
-    """Shade and bold table header rows; set document properties."""
+    """Flatten styles for Google Docs, shade table header rows, set properties."""
     doc = Document(str(path))
+    flatten_styles(doc)
     for table in doc.tables:
         for cell in table.rows[0].cells:
             _insert_in_order(
