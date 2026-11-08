@@ -39,12 +39,16 @@ def _to_numeric(raw: pd.Series, y: str) -> pd.Series:
         raise TypeError(f"Column '{y}' must be numeric")
     if pd.api.types.is_numeric_dtype(raw):
         return raw.astype(float)
+    # Spec, stage A: coerce to numbers; unconvertible values become NaN and are dropped later.
     numeric = pd.to_numeric(raw, errors="coerce")
-    # Values that became NaN only because of the coercion are non-numeric strings.
     coerced = numeric.isna() & raw.notna()
+    if raw.notna().any() and numeric.notna().sum() == 0:
+        raise TypeError(f"Column '{y}' must be numeric")
     if coerced.any():
-        raise TypeError(
-            f"Column '{y}' must be numeric: {int(coerced.sum())} value(s) cannot be converted"
+        warnings.warn(
+            f"Column '{y}': {int(coerced.sum())} non-numeric value(s) converted to NaN",
+            RaincloudWarning,
+            stacklevel=4,
         )
     return numeric.astype(float)
 

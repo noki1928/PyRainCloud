@@ -1,9 +1,10 @@
+from pathlib import Path
+
 import matplotlib
 
 matplotlib.use("Agg")
 
 import matplotlib.pyplot as plt  # noqa: E402
-import numpy as np  # noqa: E402
 import pandas as pd  # noqa: E402
 import pytest  # noqa: E402
 
@@ -14,15 +15,10 @@ def _close_figures():
     plt.close("all")
 
 
+FIXTURES = Path(__file__).parent / "fixtures"
+
+
 @pytest.fixture
 def df() -> pd.DataFrame:
-    """Example dataset from the business hypothesis: 3 groups × 30 reaction times."""
-    rng = np.random.default_rng(42)
-    return pd.DataFrame(
-        {
-            "condition": ["Control"] * 30 + ["Treatment A"] * 30 + ["Treatment B"] * 30,
-            "reaction_time": np.concatenate(
-                [rng.normal(500, 50, 30), rng.normal(450, 60, 30), rng.normal(480, 55, 30)]
-            ),
-        }
-    )
+    """Acceptance dataset (spec, appendix A): 3 groups × 30 reaction times in ms."""
+    return pd.read_csv(FIXTURES / "reaction_times.csv")

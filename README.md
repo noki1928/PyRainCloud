@@ -15,7 +15,7 @@ fig, ax = rc.raincloud(data=df, x="group", y="reaction_time")
 - API в стиле seaborn: `data=`, `x=`, `y=`
 - работает локально, без сети; ничего не пишет на диск и не вызывает `plt.show()`
 - Python ≥ 3.9, pandas ≥ 1.5, matplotlib ≥ 3.5, numpy, scipy
-- лицензия MIT
+- лицензия MIT · текущая версия **0.1.0** (MVP), история изменений — [CHANGELOG.md](CHANGELOG.md)
 
 ---
 
@@ -217,7 +217,7 @@ rc.raincloud(data, x, y, *, orient="v", palette=None, cloud_alpha=0.5, cloud_wid
 | Ситуация | Исключение | Сообщение |
 |---|---|---|
 | нет колонки | `ValueError` | `Column 'group' not found in data` |
-| `y` не числовая | `TypeError` | `Column 'y' must be numeric` |
+| в `y` нет ни одного числа | `TypeError` | `Column 'y' must be numeric` |
 | `orient='z'` | `ValueError` | `orient must be 'v' or 'h'` |
 | `cloud_alpha=1.5` | `ValueError` | `cloud_alpha must be in [0, 1]` |
 | пустой DataFrame | `ValueError` | `data is empty` |
@@ -226,6 +226,7 @@ rc.raincloud(data, x, y, *, orient="v", palette=None, cloud_alpha=0.5, cloud_wid
 
 ### Предупреждения (`pyraincloud.RaincloudWarning`)
 
+- нечисловые значения в `y` (например, `"n/a"`) приведены к NaN — `pd.to_numeric(errors="coerce")`;
 - отброшены NaN в `y` или строки без группы;
 - группа из 1 значения или с нулевой дисперсией — облако для неё не рисуется (box и точка остаются);
 - малая выборка (n < 5) — оценка плотности может быть неточной;
@@ -245,7 +246,7 @@ uv sync                       # окружение + dev-зависимости
 uv run pytest -q              # тесты
 uv run ruff check src tests   # линтер
 uv run ruff format src tests  # форматирование
-uv run python examples/quickstart.py   # перерисовать картинки в docs/images
+uv run python examples/quickstart.py   # картинки для README + examples/raincloud_plot.pdf
 uv run python docs/make_screens.py     # скриншоты шагов для инструкции (docs/screens)
 uv run python docs/build_user_guide.py # инструкция пользователя .docx по шаблону
 uv build                      # sdist + wheel в dist/
@@ -256,7 +257,7 @@ uvx twine check dist/*        # проверка перед публикацие
 
 ```bash
 python -m venv .venv && source .venv/bin/activate
-pip install -e . pytest ruff build twine
+pip install -e ".[dev]"
 pytest -q
 python -m build
 ```
@@ -275,14 +276,26 @@ src/pyraincloud/
 ├── style.py       # значения по умолчанию, палитра, проверка параметров
 └── exceptions.py  # RaincloudWarning
 tests/             # unit + интеграционные тесты (US1–US3, граничные случаи)
-examples/          # quickstart.py и quickstart.ipynb
+└── fixtures/      # тестовый набор reaction_times.csv (критерии приёмки)
+examples/          # quickstart.py, quickstart.ipynb, raincloud_plot.pdf/.png
 docs/              # картинки, скриншоты, инструкция пользователя (.docx) и её генератор
 ```
 
 ## Ограничения MVP
 
-Не входит в 0.1.0: статистические аннотации и p-value (делаются через возвращённый `ax`),
-расчёт t-test/ANOVA, facet-сетки, интерактивный экспорт, conda-пакет.
+Не входит в 0.1.0 (по ТЗ):
+
+- статистические аннотации и p-value — делаются через возвращённый `ax`;
+- автоматический расчёт статистики (t-test, ANOVA);
+- facet / subplot-сетка из коробки — используйте `ax=` с `plt.subplots`;
+- интерактивный HTML-экспорт и Plotly;
+- пакетная обработка и стилевые пресеты;
+- conda-пакет, плагины IDE, GUI.
+
+Прореживание точек на больших наборах не реализовано: при числе точек больше 50 000
+выводится предупреждение, а прореживать данные для отображения нужно самостоятельно,
+например `df.groupby("group").sample(n=2000, random_state=0)`, или передать
+`add_points=False`. Облако и ящик в любом случае считаются по всем данным.
 
 ## Лицензия
 

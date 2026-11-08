@@ -79,10 +79,13 @@ def draw_rain(
     rng: np.random.Generator,
     orient: str,
 ) -> None:
-    """Raw observations jittered inside a narrow band next to the box."""
-    start = box_width / 2 + style.RAIN_GAP
-    jitter = rng.uniform(start, start + style.RAIN_SPREAD, size=values.size)
-    cat = pos + side * jitter
+    """Raw observations jittered along the category axis on the ``side`` of the box.
+
+    Spec, stage D: ``offset = rng.uniform(-j, j)`` around the centre of the rain band.
+    """
+    centre = box_width / 2 + style.RAIN_GAP + style.RAIN_JITTER
+    offset = rng.uniform(-style.RAIN_JITTER, style.RAIN_JITTER, size=values.size)
+    cat = pos + side * (centre + offset)
     xs, ys = (cat, values) if orient == "v" else (values, cat)
     # ``point_size`` follows ``markersize`` semantics; scatter expects points².
     ax.scatter(xs, ys, s=size**2, color=color, alpha=alpha, linewidths=0, zorder=2)

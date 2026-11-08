@@ -9,6 +9,7 @@ from itertools import cycle, islice
 import matplotlib as mpl
 from matplotlib.colors import is_color_like
 
+# Default values of raincloud() parameters: the single place to change them.
 DEFAULTS = {
     "orient": "v",
     "cloud_alpha": 0.5,
@@ -26,7 +27,7 @@ BOX_LINEWIDTH = 1.2
 CLOUD_LINEWIDTH = 1.0
 CLOUD_GAP = 0.03  # distance between box edge and the cloud base
 RAIN_GAP = 0.05  # distance between box edge and the rain band
-RAIN_SPREAD = 0.08  # jitter band width along the category axis
+RAIN_JITTER = 0.05  # j: half-width of the jitter, spec range 0.05-0.1
 MAX_POINTS = 50_000
 
 

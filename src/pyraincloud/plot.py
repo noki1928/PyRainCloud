@@ -16,6 +16,7 @@ from . import artists, style
 from .data import group_data
 from .density import half_violin
 from .exceptions import RaincloudWarning
+from .style import DEFAULTS
 
 RandomState = Union[int, np.random.Generator, None]
 
@@ -25,15 +26,15 @@ def raincloud(
     x: str,
     y: str,
     *,
-    orient: Literal["v", "h"] = "v",
+    orient: Literal["v", "h"] = DEFAULTS["orient"],
     palette: Sequence[str] | None = None,
-    cloud_alpha: float = 0.5,
-    cloud_width: float = 0.8,
-    point_size: float = 3.0,
-    point_alpha: float = 0.6,
-    box_width: float = 0.15,
-    add_boxes: bool = True,
-    add_points: bool = True,
+    cloud_alpha: float = DEFAULTS["cloud_alpha"],
+    cloud_width: float = DEFAULTS["cloud_width"],
+    point_size: float = DEFAULTS["point_size"],
+    point_alpha: float = DEFAULTS["point_alpha"],
+    box_width: float = DEFAULTS["box_width"],
+    add_boxes: bool = DEFAULTS["add_boxes"],
+    add_points: bool = DEFAULTS["add_points"],
     ax: Axes | None = None,
     random_state: RandomState = None,
 ) -> tuple[Figure, Axes]:
@@ -145,7 +146,8 @@ def raincloud(
 
     labels = [str(g.name) for g in groups]
     margin = (
-        max(cloud_start + cloud_width / 2, box_width / 2 + style.RAIN_GAP + style.RAIN_SPREAD) + 0.1
+        max(cloud_start + cloud_width / 2, box_width / 2 + style.RAIN_GAP + 2 * style.RAIN_JITTER)
+        + 0.1
     )
     lims = (positions[0] - margin, positions[-1] + margin)
     if orient == "v":

@@ -51,6 +51,15 @@ def test_numeric_strings_are_coerced():
     assert groups[0].values.tolist() == [1.5, 2.5]
 
 
+def test_non_numeric_values_coerced_to_nan_with_warning():
+    """Spec, stage A: to_numeric(errors='coerce') and drop the resulting NaN."""
+    df = pd.DataFrame({"g": ["a", "a", "a"], "v": ["1.5", "n/a", "2.5"]})
+    with pytest.warns(RaincloudWarning, match="dropped 1 NaN"):
+        with pytest.warns(RaincloudWarning, match="1 non-numeric value"):
+            groups = group_data(df, "g", "v")
+    assert groups[0].values.tolist() == [1.5, 2.5]
+
+
 def test_input_frame_is_not_modified(df):
     before = df.copy()
     group_data(df, "condition", "reaction_time")

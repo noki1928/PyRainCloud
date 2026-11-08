@@ -15,7 +15,8 @@ import pandas as pd  # noqa: E402
 
 import pyraincloud as rc  # noqa: E402
 
-OUT = Path(__file__).resolve().parent.parent / "docs" / "images"
+EXAMPLES = Path(__file__).resolve().parent
+OUT = EXAMPLES.parent / "docs" / "images"  # pictures for README
 PALETTE = ["#66c2a5", "#fc8d62", "#8da0cb"]
 
 
@@ -79,9 +80,11 @@ def main() -> None:
     ax.annotate("p < 0.05", xy=(0.5, 622), ha="center", va="bottom")
     ax.grid(axis="y", alpha=0.3)
     fig.savefig(OUT / "03_annotated.png", dpi=150)
-    fig.savefig(OUT / "raincloud_plot.pdf", dpi=300, bbox_inches="tight")
+    # WBS T11: publication-ready result saved next to the example
+    fig.savefig(EXAMPLES / "raincloud_plot.pdf", dpi=300, bbox_inches="tight")
+    fig.savefig(EXAMPLES / "raincloud_plot.png", dpi=300, bbox_inches="tight")
     plt.close("all")
-    print(f"Saved images to {OUT}")
+    print(f"Saved images to {OUT} and {EXAMPLES}")
 
 
 if __name__ == "__main__":

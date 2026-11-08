@@ -30,6 +30,37 @@ def boxes(ax):
     return [p for p in ax.patches if isinstance(p, PathPatch)]
 
 
+# --- Release metadata and defaults ----------------------------------------
+
+
+def test_version_matches_package_metadata():
+    from importlib.metadata import version
+
+    assert rc.__version__ == version("pyraincloud") == "0.1.0"
+
+
+def test_signature_defaults_come_from_style_defaults():
+    import inspect
+
+    from pyraincloud.style import DEFAULTS
+
+    params = inspect.signature(rc.raincloud).parameters
+    assert {k: params[k].default for k in DEFAULTS} == DEFAULTS
+
+
+def test_jitter_stays_within_spec_band(df):
+    """Spec, stage D: uniform(-j, j) jitter with j in 0.05-0.1 on the positive side."""
+    from pyraincloud import style
+
+    assert 0.05 <= style.RAIN_JITTER <= 0.1
+    box_width = 0.15
+    _, ax = rc.raincloud(data=df, x="condition", y="reaction_time", box_width=box_width)
+    centre = box_width / 2 + style.RAIN_GAP + style.RAIN_JITTER
+    for pos, points in enumerate(rain(ax)):
+        offsets = points.get_offsets()[:, 0] - pos - centre
+        assert np.all(np.abs(offsets) <= style.RAIN_JITTER + 1e-12)
+
+
 # --- US1: basic plot -------------------------------------------------------
 
 
