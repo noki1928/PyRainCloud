@@ -27,7 +27,7 @@ SCREENS = DOCS / "screens"
 IMAGES = DOCS / "images"
 OUTPUT = DOCS / "Инструкция_пользователя_PyRainCloud.docx"
 
-REPO_URL = "https://github.com/noki1928/pyraincloud"
+REPO_URL = "https://github.com/noki1928/PyRainCloud"
 BODY_FONT = "Calibri"
 CODE_FONT = "Consolas"
 

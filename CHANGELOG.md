@@ -21,4 +21,4 @@
   Actions (Linux / macOS / Windows и минимальные версии зависимостей).
 - README, пример `examples/quickstart.ipynb`, инструкция пользователя в `docs/`.
 
-[0.1.0]: https://github.com/noki1928/pyraincloud/releases/tag/v0.1.0
+[0.1.0]: https://github.com/noki1928/PyRainCloud/releases/tag/v0.1.0

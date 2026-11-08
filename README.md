@@ -27,7 +27,7 @@ fig, ax = rc.raincloud(data=df, x="group", y="reaction_time")
 | Источник | Что подставлять вместо `<ИСТОЧНИК>` |
 |---|---|
 | PyPI (после публикации) | `pyraincloud` |
-| Git-репозиторий | `"pyraincloud @ git+https://github.com/noki1928/pyraincloud.git"` |
+| Git-репозиторий | `"pyraincloud @ git+https://github.com/noki1928/PyRainCloud.git"` |
 | Локальная папка с исходниками | `./pyraincloud` (путь к папке) |
 | Собранный wheel | `dist/pyraincloud-0.1.0-py3-none-any.whl` |
 
@@ -76,7 +76,7 @@ pip install <ИСТОЧНИК>
 ### Poetry
 
 ```bash
-poetry add <ИСТОЧНИК>     # для git: poetry add git+https://github.com/noki1928/pyraincloud.git
+poetry add <ИСТОЧНИК>     # для git: poetry add git+https://github.com/noki1928/PyRainCloud.git
 ```
 
 ### Pipenv
