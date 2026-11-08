@@ -1,0 +1,62 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v6
+      - run: uv run --only-group dev ruff check src tests
+      - run: uv run --only-group dev ruff format --check src tests
+
+  test:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest]
+        python-version: ["3.9", "3.11", "3.12", "3.13"]
+        include:
+          - os: windows-latest
+            python-version: "3.12"
+          - os: macos-latest
+            python-version: "3.12"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v6
+        with:
+          python-version: ${{ matrix.python-version }}
+      - run: uv sync --no-default-groups --group dev
+      - run: uv run pytest -q
+
+  # Lower bounds from the spec: pandas 1.5, matplotlib 3.5, numpy 1.22, scipy 1.8
+  minimum-versions:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v6
+      - run: uv build --wheel
+      - run: >
+          uv run --isolated --no-project --python 3.9
+          --with "numpy==1.22.*" --with "pandas==1.5.*" --with "scipy==1.8.*"
+          --with "matplotlib==3.5.*" --with "pytest<9"
+          --with dist/pyraincloud-*.whl
+          pytest -q -p no:cacheprovider
+
+  build:
+    runs-on: ubuntu-latest
+    needs: [lint, test, minimum-versions]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v6
+      - run: uv build
+      - run: uvx twine check dist/*
+      - uses: actions/upload-artifact@v4
+        with:
+          name: dist
+          path: dist/
