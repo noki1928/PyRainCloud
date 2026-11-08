@@ -16,6 +16,7 @@ fig, ax = rc.raincloud(data=df, x="group", y="reaction_time")
 - работает локально, без сети; ничего не пишет на диск и не вызывает `plt.show()`
 - Python ≥ 3.9, pandas ≥ 1.5, matplotlib ≥ 3.5, numpy, scipy
 - лицензия MIT · текущая версия **0.1.0** (MVP), история изменений — [CHANGELOG.md](CHANGELOG.md)
+- пошаговая [инструкция пользователя](docs/USER_GUIDE.md) (есть и [в Word](docs/Инструкция_пользователя_PyRainCloud.docx))
 
 ---
 
@@ -257,7 +258,7 @@ uv run pytest -q              # тесты
 uv run ruff check src tests   # линтер
 uv run ruff format src tests  # форматирование
 uv run python examples/quickstart.py   # пример-скрипт → examples/raincloud_plot.pdf/.png
-uv run python docs/build_user_guide.py # инструкция пользователя .docx по шаблону
+uv run python docs/build_user_guide.py # docs/USER_GUIDE.md → .docx (pandoc)
 uv build                      # sdist + wheel в dist/
 uvx twine check dist/*        # проверка перед публикацией
 ```
@@ -290,7 +291,9 @@ examples/          # quickstart.ipynb (ноутбук), quickstart.py (скри�
 docs/
 ├── images/        # графики для README (рисуются ноутбуком examples/quickstart.ipynb)
 ├── screens/       # скриншоты из nteract и терминала для инструкции
-└── Инструкция_пользователя_PyRainCloud.docx  # + build_user_guide.py, template/
+├── USER_GUIDE.md  # инструкция пользователя (исходник)
+├── Инструкция_пользователя_PyRainCloud.docx  # она же в Word, build_user_guide.py
+└── template/      # исходный шаблон инструкции из задания
 ```
 
 ## Ограничения MVP
