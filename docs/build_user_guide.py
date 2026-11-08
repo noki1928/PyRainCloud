@@ -1,10 +1,10 @@
 """Fill the user guide template (docs/template/user_guide_template.docx).
 
 Keeps the template's page setup, headings and bullet lists, replaces the
-placeholders with PyRainCloud content and inserts the screens rendered by
-docs/make_screens.py.
+placeholders with PyRainCloud content and inserts the screenshots from docs/screens
+(taken in nteract with examples/quickstart.ipynb and in a terminal).
 
-Run:  uv run python docs/make_screens.py && uv run python docs/build_user_guide.py
+Run:  uv run python docs/build_user_guide.py
 """
 
 from __future__ import annotations
@@ -386,21 +386,26 @@ def build() -> Path:
             (" или ", "n"),
             ("rc.raincloud?", "c"),
             (
-                " в Jupyter. Главный «экран» продукта — ячейка с вызовом функции и график под ней.",
+                " в Jupyter или nteract. Главный «экран» продукта — ячейка с вызовом функции и "
+                "график под ней. Готовый ноутбук со всеми шагами этой инструкции — ",
                 "n",
             ),
+            ("examples/quickstart.ipynb", "c"),
+            (" в репозитории.", "n"),
         ],
     )
     p = g.set(18, [("Скриншоты стартового экрана:", "b")])
     p = g.figure_after(
         p,
-        S / "00_install_check.png",
-        "Проверка установки в терминале: библиотека импортируется, версия 0.1.0",
+        S / "00_install.png",
+        "Установка в чистый uv-проект прямо из релиза v0.1.0 на GitHub и проверка версии "
+        "(терминал kitty)",
     )
     g.figure_after(
         p,
-        S / "01_import.png",
-        "Первая ячейка Jupyter: импорт библиотеки и описание функции raincloud",
+        S / "01_start.png",
+        "Ноутбук examples/quickstart.ipynb в nteract: импорт библиотеки и описание функции "
+        "raincloud",
     )
 
     # --- 2. Core-функция -----------------------------------------------------
@@ -513,10 +518,14 @@ fig, ax = rc.raincloud(data=df, x="group", y="reaction_time")""",
     )
     p = g.set(30, [("Скриншоты каждого шага:", "b")])
     p = g.figure_after(
-        p, S / "02_data.png", "Шаг 1 — данные в DataFrame: колонка группы и числовая колонка"
+        p,
+        S / "02_data.png",
+        "Шаг 1 — данные в DataFrame: колонка группы и числовая колонка (nteract)",
     )
     g.figure_after(
-        p, S / "03_basic.png", "Шаги 2–4 — вызов rc.raincloud и готовый график под ячейкой"
+        p,
+        S / "03_basic.png",
+        "Шаги 2–4 — вызов rc.raincloud и готовый график под ячейкой (nteract)",
     )
 
     # --- 3. Функция №2 -------------------------------------------------------
@@ -738,7 +747,10 @@ fig.savefig("raincloud_plot.pdf", dpi=300, bbox_inches="tight")""",
     p = g.figure_after(
         p, S / "06_annotate.png", "Заголовок, подписи осей и отметка значимости поверх графика"
     )
-    g.figure_after(p, S / "07_savefig.png", "Сохранение в PDF и PNG: файлы созданы в текущей папке")
+    p = g.figure_after(
+        p, S / "07_savefig.png", "Сохранение в PDF и PNG: файлы созданы в текущей папке"
+    )
+    g.figure_after(p, S / "08_subplots.png", "Два графика на одной фигуре: оси переданы через ax=")
 
     # --- 5. Ошибки -----------------------------------------------------------
     g.remove(52)
@@ -757,7 +769,7 @@ fig.savefig("raincloud_plot.pdf", dpi=300, bbox_inches="tight")""",
             (" — важны регистр и пробелы.", "n"),
         ],
     )
-    p = g.figure_after(p, S / "08_err_column.png", "Сообщение об ошибке в имени колонки")
+    p = g.figure_after(p, S / "09_err_column.png", "Сообщение об ошибке в имени колонки")
     p2 = g.set(
         54,
         [
@@ -769,7 +781,7 @@ fig.savefig("raincloud_plot.pdf", dpi=300, bbox_inches="tight")""",
             (" — тогда цвета подберутся автоматически.", "n"),
         ],
     )
-    p2 = g.figure_after(p2, S / "09_err_palette.png", "Сообщение о слишком короткой палитре")
+    p2 = g.figure_after(p2, S / "10_err_palette.png", "Сообщение о слишком короткой палитре")
     p3 = g.set(
         55,
         [
@@ -805,7 +817,7 @@ fig.savefig("raincloud_plot.pdf", dpi=300, bbox_inches="tight")""",
         ],
     )
     p3 = g.figure_after(
-        p3, S / "10_warn_nan.png", "Предупреждения о пропусках: график всё равно построен"
+        p3, S / "11_warn_nan.png", "Предупреждения о пропусках: график всё равно построен"
     )
     p3 = g.item_after(
         p3,

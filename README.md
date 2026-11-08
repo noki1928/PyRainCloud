@@ -181,6 +181,16 @@ rc.raincloud(data=df_session1, x="group", y="score", ax=ax1)
 rc.raincloud(data=df_session2, x="group", y="score", ax=ax2)
 ```
 
+![Два графика на одной фигуре](docs/images/04_subplots.png)
+
+### Пошаговый ноутбук
+
+[examples/quickstart.ipynb](examples/quickstart.ipynb) — весь путь пользователя с результатами
+выполнения: данные → базовый график → настройка → подписи и экспорт → несколько осей →
+ошибки и предупреждения. Открывается в Jupyter, JupyterLab, VS Code, nteract и прямо на GitHub.
+
+![Ноутбук quickstart.ipynb в nteract](docs/screens/03_basic.png)
+
 ---
 
 ## API
@@ -246,8 +256,7 @@ uv sync                       # окружение + dev-зависимости
 uv run pytest -q              # тесты
 uv run ruff check src tests   # линтер
 uv run ruff format src tests  # форматирование
-uv run python examples/quickstart.py   # картинки для README + examples/raincloud_plot.pdf
-uv run python docs/make_screens.py     # скриншоты шагов для инструкции (docs/screens)
+uv run python examples/quickstart.py   # пример-скрипт → examples/raincloud_plot.pdf/.png
 uv run python docs/build_user_guide.py # инструкция пользователя .docx по шаблону
 uv build                      # sdist + wheel в dist/
 uvx twine check dist/*        # проверка перед публикацией
@@ -277,8 +286,11 @@ src/pyraincloud/
 └── exceptions.py  # RaincloudWarning
 tests/             # unit + интеграционные тесты (US1–US3, граничные случаи)
 └── fixtures/      # тестовый набор reaction_times.csv (критерии приёмки)
-examples/          # quickstart.py, quickstart.ipynb, raincloud_plot.pdf/.png
-docs/              # картинки, скриншоты, инструкция пользователя (.docx) и её генератор
+examples/          # quickstart.ipynb (ноутбук), quickstart.py (скрипт), raincloud_plot.pdf/.png
+docs/
+├── images/        # графики для README (рисуются ноутбуком examples/quickstart.ipynb)
+├── screens/       # скриншоты из nteract и терминала для инструкции
+└── Инструкция_пользователя_PyRainCloud.docx  # + build_user_guide.py, template/
 ```
 
 ## Ограничения MVP
